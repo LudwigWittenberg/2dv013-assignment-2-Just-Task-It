@@ -115,8 +115,6 @@ try {
 		res.status(err.status || 500).render("errors/error", { error: err });
 	});
 
-	console.log("Starting Server");
-
 	// Starts the HTTP server listening for connections.
 	const server = app.listen(process.env.PORT, () => {
 		logger.info(`Server running at http://localhost:${server.address().port}`);
