@@ -10,8 +10,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon --inspect --env-file=.env src/server.js",
-    "lint": "npx eslint ./src || exit 0",
-    "lint:fix": "npx eslint ./src --fix || exit 0",
+    "lint": "npx biome lint ./src || exit 0",
+    "lint:fix": "npx biome check ./src --fix || exit 0",
     "docker:dev": "docker compose -p 2dv013-jit-dev -f docker-compose.yaml -f docker-compose.development.yaml up --build",
     "docker:prod": "docker compose -p 2dv013-jit -f docker-compose.yaml -f docker-compose.production.yaml up --build"
   },
@@ -22,7 +22,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@lnu/json-js-cycle": "^2.0.5",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-ejs-layouts": "^2.5.1",
@@ -35,7 +34,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.6",
-    "@lnu/eslint-config": "^1.1.10",
     "nodemon": "^3.0.1"
   }
 }
