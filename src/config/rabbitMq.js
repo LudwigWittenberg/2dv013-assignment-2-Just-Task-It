@@ -4,6 +4,7 @@ import { logger } from "./winston.js";
 let channel;
 
 async function connectRabbitMq(connectionString) {
+	logger.info("Connecting to RabbitMQ");
 	return new Promise((resolve, reject) => {
 		amqp.connect(connectionString, function createChannel(error0, connection) {
 			if (error0) {
@@ -43,11 +44,11 @@ function sendRabbitMessage(msg) {
 	channel.assertQueue(QUEUE, {
 		durable: true,
 		arguments: {
-			"x-queue-type": "qourum",
+			"x-queue-type": "quorum",
 		},
 	});
 
-	channel.sendToQueue(QUEUE, Buffer.from(msg), {
+	channel.sendToQueue(QUEUE, Buffer.from(JSON.stringify(msg)), {
 		persistent: true,
 	});
 }

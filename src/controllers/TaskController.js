@@ -6,6 +6,7 @@
  */
 
 import { logger } from "../config/winston.js";
+import { rabbitEvent } from "../lib/RabbitEvent.js";
 import { TaskModel } from "../models/TaskModel.js";
 
 /**
@@ -91,10 +92,14 @@ export class TaskController {
 
 			const { description, done } = req.body;
 
-			await TaskModel.create({
+			const data = await TaskModel.create({
 				description,
 				done: done === "on",
 			});
+
+			console.log("Data", data);
+
+			rabbitEvent("task_created", data);
 
 			logger.silly("Created new task document");
 
