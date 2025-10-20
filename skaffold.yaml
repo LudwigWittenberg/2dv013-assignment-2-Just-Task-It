@@ -1,0 +1,26 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: k8s-web-application
+build:
+  artifacts:
+    # - image: taskit
+    - image: gitlab.lnu.se:5050/2dv013/content/examples/example-kuberneterized-web-application/taskit
+      docker:
+        dockerfile: Dockerfile.production
+manifests:
+  rawYaml:
+    - k8s/ingress.yaml
+    - k8s/mongodb.yaml
+    - k8s/taskit.yaml
+deploy:
+  kubectl: {}
+
+# Production profile
+# A slightly modyfied ingress configuration needed in production.
+profiles:
+- name: production
+  patches:
+  - op: replace 
+    path: /manifests/rawYaml/0  # JSON Pointer to ingress.yaml
+    value: k8s/ingress.production.yaml  # The value for the ingressClassName field is added in this one
