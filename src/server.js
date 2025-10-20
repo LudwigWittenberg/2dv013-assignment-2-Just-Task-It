@@ -5,15 +5,18 @@
  * @version 3.1.0
  */
 
+
+// biome-ignore assist/source/organizeImports: MUST BE FIRST!
+import  httpContext from "express-http-context"; // Must be first!
 import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import expressLayouts from "express-ejs-layouts";
-import httpContext from "express-http-context"; // Must be first!
 import session from "express-session";
 import { connectToDatabase } from "./config/mongoose.js";
 import { morganLogger } from "./config/morgan.js";
+import { connectRabbitMq } from "./config/rabbitMq.js";
 // TODO: Substitute the current in-memory session store with a persistent session store, such as Redis.
 import { sessionOptions } from "./config/sessionOptions.js";
 import { logger } from "./config/winston.js";
@@ -22,6 +25,9 @@ import { router } from "./routes/router.js";
 try {
 	// Connect to MongoDB.
 	await connectToDatabase(process.env.DB_CONNECTION_STRING);
+
+	// Connecto to RabbitMQ
+	await connectRabbitMq(process.env.RABBIT_CONNECTION_STRING);
 
 	// Creates an Express application.
 	const app = express();
