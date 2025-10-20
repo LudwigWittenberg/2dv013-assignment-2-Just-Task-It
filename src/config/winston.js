@@ -6,6 +6,7 @@
  */
 
 import httpContext from "express-http-context"; // Must be first!
+import "@lnu/json-js-cycle";
 import { addColors, createLogger, format, transports } from "winston";
 
 // Destructuring assignment for convenience.
@@ -26,8 +27,7 @@ addColors({
 });
 
 // Finds ANSI color sequences.
-// eslint-disable-next-line no-control-regex
-// biome-ignore lint/suspicious/noControlCharactersInRegex: regular expression
+// biome-ignore lint/suspicious/noControlCharactersInRegex: Ok
 const decolorizeRegex = /\x1b\[[0-9]{1,3}m/gi;
 
 const defaultMetadata = {
@@ -96,36 +96,6 @@ const isEmptyData = (value) => {
 	return false;
 };
 
-// Safely serializes objects by removing circular references and preserving Error fields.
-const getCircularReplacer = () => {
-	const seen = new WeakSet();
-	return (key, value) => {
-		if (value instanceof Error) {
-			return {
-				name: value.name,
-				message: value.message,
-				stack: value.stack,
-				...value,
-			};
-		}
-		if (typeof value === "object" && value !== null) {
-			if (seen.has(value)) {
-				return "[Circular]";
-			}
-			seen.add(value);
-		}
-		return value;
-	};
-};
-
-const decycle = (value) => {
-	try {
-		return JSON.parse(JSON.stringify(value, getCircularReplacer()));
-	} catch {
-		return undefined;
-	}
-};
-
 /**
  * Formats the metadata property.
  *
@@ -134,7 +104,11 @@ const decycle = (value) => {
 const metadataFormatter = format((info) => {
 	// Serialize the metadata property.
 	if (info.metadata) {
-		info.metadata = decycle(info.metadata);
+		// Deep copies the metadata object and returns a new object with
+		// enumerable and non-enumrele properties (cyclical structures are handled).
+		info.metadata = JSON.decycle(info.metadata, {
+			includeNonEnumerableProperties: true,
+		});
 	}
 
 	// Only add a defaultMetadata property if there is any non-empty data.
@@ -245,7 +219,7 @@ if (process.env.LOGGER_DB_CONNECTION_STRING) {
 
 	logger.add(
 		new transports.MongoDB({
-			level: process.env.LOG_LEVEL || "warn",
+			level: "warn",
 			db: process.env.LOGGER_DB_CONNECTION_STRING,
 			options: {
 				poolSize: 2,

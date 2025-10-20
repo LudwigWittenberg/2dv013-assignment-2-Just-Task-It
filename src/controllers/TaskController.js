@@ -138,7 +138,6 @@ export class TaskController {
 			if ("description" in req.body) {
 				req.doc.description = req.body.description;
 			}
-
 			if ("done" in req.body) {
 				req.doc.done = req.body.done === "on";
 			}

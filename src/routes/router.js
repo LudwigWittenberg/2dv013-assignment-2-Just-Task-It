@@ -7,14 +7,13 @@
 
 import http from "node:http";
 import express from "express";
-import { validCookie } from "../middleware/cookies.js";
 import { router as homeRouter } from "./homeRouter.js";
 import { router as taskRouter } from "./taskRouter.js";
 
 export const router = express.Router();
 
-router.use("/", validCookie, homeRouter);
-router.use("/tasks", validCookie, taskRouter);
+router.use("/", homeRouter);
+router.use("/tasks", taskRouter);
 
 // Catch 404 (ALWAYS keep this as the last route).
 router.use("*", (req, res, next) => {

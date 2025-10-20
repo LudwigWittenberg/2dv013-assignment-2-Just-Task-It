@@ -5,14 +5,12 @@
  * @version 3.1.0
  */
 
-
-// biome-ignore assist/source/organizeImports: Must be first!
-import  httpContext from "express-http-context"; // Must be first!
 import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import expressLayouts from "express-ejs-layouts";
+import httpContext from "express-http-context"; // Must be first!
 import session from "express-session";
 import { connectToDatabase } from "./config/mongoose.js";
 import { morganLogger } from "./config/morgan.js";
@@ -31,7 +29,7 @@ try {
 	// Get the directory name of this module's path.
 	const directoryFullName = dirname(fileURLToPath(import.meta.url));
 
-	// Set the base URL to use for all relative URLs in a document.what
+	// Set the base URL to use for all relative URLs in a document.
 	const baseURL = process.env.BASE_URL || "/";
 
 	// View engine setup.
@@ -70,7 +68,6 @@ try {
 		req.requestUuid = randomUUID();
 		httpContext.set("request", req);
 
-		// TODO: Remove session
 		// Flash messages - survives only a round trip.
 		if (req.session.flash) {
 			res.locals.flash = req.session.flash;
@@ -121,7 +118,6 @@ try {
 		logger.info("Press Ctrl-C to terminate...");
 	});
 } catch (err) {
-  console.log(err)
 	logger.error(err.message, { error: err });
 	process.exitCode = 1;
 }

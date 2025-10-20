@@ -4,9 +4,6 @@
 # The 'mongodb' service uses a volume to persist data, and the 'just-task-it' service is built from a specific Dockerfile.
 # Environment variables for the 'just-task-it' service are also set here, with some variables having production-specific values.
 
-# Specifies the version of the Docker Compose file format. This should match the version of Docker Compose you're using.
-version: "3.8"
-
 # The 'services' block defines all the services (i.e., containers) that make up your application.
 services:
   # Defines a service named 'mongodb'.
@@ -20,7 +17,7 @@ services:
   # Defines a service named 'just-task-it'.
   just-task-it:
     # Specifies that Docker should build the image using the Dockerfile.production file.
-    build: 
+    build:
       dockerfile: Dockerfile.production
 
     # The 'environment' directive is used to set environment variables in the Docker container.

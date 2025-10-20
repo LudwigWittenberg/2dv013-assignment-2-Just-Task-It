@@ -4,9 +4,6 @@
 # The 'mongodb' service uses a volume to persist data, and the 'just-task-it' service is built from a development-specific Dockerfile.
 # The 'just-task-it' service also mounts a volume for the 'src' directory to allow for live code updates, and sets an environment variable for the log level.
 
-# Specifies the version of the Docker Compose file format. This should match the version of Docker Compose being used.
-version: "3.8"
-
 # The 'services' block defines all the services (i.e., containers) that make up the application.
 services:
   # Defines a service named 'mongodb'.
@@ -20,16 +17,22 @@ services:
   # Defines a service named 'just-task-it'.
   just-task-it:
     # Specifies that Docker should build the image using the Dockerfile.deveopment file.
-    build: 
+    build:
       dockerfile: Dockerfile.development
 
     # The 'volumes' directive is used here to mount the 'src' directory on the host to the '/usr/src/app/src' directory in the container.
     # This allows for changes made in the 'src' directory on the host to be reflected in the container.
+    # Mount the 'node_modules' directory in the container to avoid conflicts with the host.
     volumes:
-      - ./src:/usr/src/app/src
+      - ./:/usr/src/app/
+      - node_modules:/usr/src/app/node_modules
 
     # The 'env_file' directive is used to specify a file containing environment variables to be set in the container.
     # Each line in the file should be in the form VAR=VALUE.
     # In this case, it's set to use the '.env' file in the current directory.
     env_file:
       - ./.env
+
+volumes:
+  # Defines a named volume named 'node_modules'.
+  node_modules:
