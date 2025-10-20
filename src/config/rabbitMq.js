@@ -4,9 +4,8 @@ import { logger } from "./winston.js";
 let channel;
 
 async function connectRabbitMq(connectionString) {
-	await amqp.connect(
-		connectionString,
-		function createChannel(error0, connection) {
+	return new Promise((resolve, reject) => {
+		amqp.connect(connectionString, function createChannel(error0, connection) {
 			if (error0) {
 				console.log(error0);
 				throw error0;
@@ -27,9 +26,11 @@ async function connectRabbitMq(connectionString) {
 				}
 
 				channel = innerChannel;
+
+				resolve(connection);
 			});
-		},
-	);
+		});
+	});
 }
 
 function sendRabbitMessage(msg) {
@@ -45,6 +46,7 @@ function sendRabbitMessage(msg) {
 			"x-queue-type": "qourum",
 		},
 	});
+
 	channel.sendToQueue(QUEUE, Buffer.from(msg), {
 		persistent: true,
 	});
