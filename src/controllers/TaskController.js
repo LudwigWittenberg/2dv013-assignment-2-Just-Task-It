@@ -97,8 +97,7 @@ export class TaskController {
 				done: done === "on",
 			});
 
-			console.log("Data", data);
-
+			// Create a rabbit event
 			rabbitEvent("task_created", data);
 
 			logger.silly("Created new task document");
@@ -145,6 +144,10 @@ export class TaskController {
 			}
 			if ("done" in req.body) {
 				req.doc.done = req.body.done === "on";
+				rabbitEvent("task_completed", req.doc);
+			} else {
+				req.doc.done = req.body.done === "off";
+				rabbitEvent("task_uncompleted", req.doc);
 			}
 
 			if (req.doc.isModified()) {

@@ -48,6 +48,8 @@ function sendRabbitMessage(msg) {
 		},
 	});
 
+	console.log("Sending message: ", msg)
+
 	channel.sendToQueue(QUEUE, Buffer.from(JSON.stringify(msg)), {
 		persistent: true,
 	});
