@@ -28,6 +28,15 @@ async function connectRabbitMq(connectionString) {
 
 				channel = innerChannel;
 
+				const QUEUE = process.env.RABBIT_QUEUE;
+
+				channel.assertQueue(QUEUE, {
+					durable: true,
+					arguments: {
+						"x-queue-type": "quorum",
+					},
+				});
+
 				resolve(connection);
 			});
 		});
@@ -40,13 +49,6 @@ function sendRabbitMessage(msg) {
 	}
 
 	const QUEUE = process.env.RABBIT_QUEUE;
-
-	channel.assertQueue(QUEUE, {
-		durable: true,
-		arguments: {
-			"x-queue-type": "quorum",
-		},
-	});
 
 	console.log("Sending message: ", msg)
 

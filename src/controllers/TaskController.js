@@ -100,6 +100,12 @@ export class TaskController {
 			// Create a rabbit event
 			rabbitEvent("task_created", data);
 
+			if (done === 'on') {
+				rabbitEvent("task_completed", data);
+			} else {
+				rabbitEvent("task_uncompleted", data);
+			}
+
 			logger.silly("Created new task document");
 
 			req.session.flash = {
@@ -145,11 +151,7 @@ export class TaskController {
 			if ("done" in req.body) {
 				req.doc.done = req.body.done === "on";
 				rabbitEvent("task_completed", req.doc);
-			} else {
-				req.doc.done = req.body.done === "off";
-				rabbitEvent("task_uncompleted", req.doc);
 			}
-
 			if (req.doc.isModified()) {
 				await req.doc.save();
 				logger.silly("Updated task document", { id: req.doc.id });
