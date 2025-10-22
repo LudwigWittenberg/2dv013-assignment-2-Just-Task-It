@@ -6,16 +6,8 @@
 
 # The 'services' block defines all the services (i.e., containers) that make up the application.
 services:
-  # Defines a service named 'mongodb'.
-  mongodb:
-    # The 'volumes' directive is used to mount paths or named volumes.
-    # Here, it mounts the '.volumes/mongodb' directory on the host to the '/data/db' directory in the container.
-    # This allows the MongoDB data to persist across container restarts.
-    volumes:
-      - ./.volumes/mongodb:/data/db
-
-  # Defines a service named 'just-task-it'.
   just-task-it:
+    container_name: just-task-it
     # Specifies that Docker should build the image using the Dockerfile.deveopment file.
     build:
       dockerfile: Dockerfile.development

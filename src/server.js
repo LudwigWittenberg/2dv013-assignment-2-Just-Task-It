@@ -18,16 +18,20 @@ import { connectToDatabase } from "./config/mongoose.js";
 import { morganLogger } from "./config/morgan.js";
 import { connectRabbitMq } from "./config/rabbitMq.js";
 // TODO: Substitute the current in-memory session store with a persistent session store, such as Redis.
-import { sessionOptions } from "./config/sessionOptions.js";
+import { getSessionOptions } from "./config/sessionOptions.js";
 import { logger } from "./config/winston.js";
 import { router } from "./routes/router.js";
+import { connectToRedis } from "./config/redis.js";
 
 try {
 	// Connect to MongoDB.
 	await connectToDatabase(process.env.DB_CONNECTION_STRING);
 
-	// Connecto to RabbitMQ
+	// Connect to RabbitMQ
 	await connectRabbitMq(process.env.RABBIT_CONNECTION_STRING);
+
+	// Cinnect to Redis
+	const redisClient = await connectToRedis(process.env.REDIS_URL);
 
 	// Creates an Express application.
 	const app = express();
@@ -57,6 +61,9 @@ try {
 	if (process.env.NODE_ENV === "production") {
 		app.set("trust proxy", 1); // trust first proxy
 	}
+
+	const sessionOptions = getSessionOptions(redisClient);
+
 	app.use(session(sessionOptions));
 
 	// Add the request-scoped context.

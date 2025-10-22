@@ -8,11 +8,14 @@ async function connectRabbitMq(connectionString) {
 	return new Promise((resolve, reject) => {
 		amqp.connect(connectionString, function createChannel(error0, connection) {
 			if (error0) {
-				console.log(error0);
-				throw error0;
+				logger.error("RabbitMQ connection error: " + error0.message);
+				reject(error0);
+				return;
 			}
 
-			connection.on("error", (err) => logger.info("RabbitMQ conn error:"));
+			connection.on("error", (err) =>
+				logger.error("RabbitMQ conn error: " + err.message),
+			);
 
 			connection.on("close", () => {
 				logger.info("RabbitMQ conn closed");
@@ -23,7 +26,9 @@ async function connectRabbitMq(connectionString) {
 
 			connection.createChannel(function (error1, innerChannel) {
 				if (error1) {
-					throw error1;
+					logger.error("RabbitMQ channel creation error: " + error1.message);
+					reject(error1);
+					return;
 				}
 
 				channel = innerChannel;
@@ -50,7 +55,7 @@ function sendRabbitMessage(msg) {
 
 	const QUEUE = process.env.RABBIT_QUEUE;
 
-	console.log("Sending message: ", msg)
+	console.log("Sending message: ", msg);
 
 	channel.sendToQueue(QUEUE, Buffer.from(JSON.stringify(msg)), {
 		persistent: true,
