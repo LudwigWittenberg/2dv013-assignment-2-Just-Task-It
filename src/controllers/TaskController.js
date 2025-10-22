@@ -102,8 +102,6 @@ export class TaskController {
 
 			if (done === 'on') {
 				rabbitEvent("task_completed", data);
-			} else {
-				rabbitEvent("task_uncompleted", data);
 			}
 
 			logger.silly("Created new task document");
