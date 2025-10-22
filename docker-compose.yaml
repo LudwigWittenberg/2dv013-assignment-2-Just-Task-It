@@ -9,7 +9,7 @@ services:
   # Defines a service named 'mongodb' that uses the mongo:8.0.0 image.
   mongodb:
     image: mongo:8.0.0
-    container_name: mongodb
+    container_name: mongodb_JTI
     ports:
       - "27017:27017"
     volumes:
@@ -47,6 +47,7 @@ services:
       - INFLUXD_PASSWORD=${INFLUXD_PASSWORD:-admin}
       - INFLUXD_RETENTION=${INFLUXD_RETENTION:-0}
       - INFLUXD_ADMIN_TOKEN=${INFLUXD_ADMIN_TOKEN:-my-super-secret-token}
+      # TODO CHANGE THIS TO ENVIROMENT VARIABLES
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
       - DOCKER_INFLUXDB_INIT_PASSWORD=admin123
@@ -78,8 +79,18 @@ services:
     container_name: grafana
     ports:
       - "3000:3000"
+    environment:
+      - INFLUXD_ORG=${INFLUXD_ORG:-jti-org}
+      - INFLUXD_BUCKET=${INFLUXD_BUCKET:-jti-bucket}
+      - INFLUXD_ADMIN_TOKEN=${INFLUXD_ADMIN_TOKEN:-my-super-secret-token}
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_INSTALL_PLUGINS=grafana-influxdb-flux-datasource
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:-admin}
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER:-admin}
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - grafana_storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboard:/etc/grafana/dashboards
 
   # Defines a service named 'just-task-it'.
   just-task-it:
@@ -157,6 +168,6 @@ services:
     
 volumes:
   influxdb_data:
-  grafana-storage:
+  grafana_storage:
   mongo_storage:
   redis_storage:

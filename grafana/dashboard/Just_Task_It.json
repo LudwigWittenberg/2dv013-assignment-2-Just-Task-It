@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -31,13 +31,13 @@
       },
       "id": 3,
       "panels": [],
-      "title": "Overview",
+      "title": "Tasks Overview",
       "type": "row"
     },
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "af1pfmembdxxcc"
+        "uid": "InfluxDB_v2_Flux"
       },
       "fieldConfig": {
         "defaults": {
@@ -62,7 +62,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 12,
         "x": 0,
         "y": 1
       },
@@ -89,7 +89,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "af1pfmembdxxcc"
+            "uid": "InfluxDB_v2_Flux"
           },
           "query": "from(bucket: \"jti-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"task_events\" and\r\n    r.event_type == \"task_created\" and\r\n    r._field == \"standard_value\"\r\n  )\r\n  |> count(column: \"_value\")\r\n  |> group(columns: [])\r\n",
           "refId": "A"
@@ -101,7 +101,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "af1pfmembdxxcc"
+        "uid": "InfluxDB_v2_Flux"
       },
       "fieldConfig": {
         "defaults": {
@@ -126,8 +126,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 8,
+        "w": 12,
+        "x": 12,
         "y": 1
       },
       "id": 2,
@@ -151,71 +151,15 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "InfluxDB_v2_Flux"
+          },
           "query": "from(bucket: \"jti-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"task_events\" and\r\n    r.event_type == \"task_completed\" and\r\n    r._field == \"standard_value\"\r\n  )\r\n  |> count(column: \"_value\")\r\n  |> group(columns: [])\r\n",
           "refId": "A"
         }
       ],
       "title": "Total Tasks Completed",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "af1pfmembdxxcc"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "continuous-BlPu"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 1
-      },
-      "id": 4,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.6.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"jti-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"task_events\" and\r\n    r.event_type == \"task_uncompleted\" and\r\n    r._field == \"standard_value\"\r\n  )\r\n  |> count(column: \"_value\")\r\n  |> group(columns: [])\r\n",
-          "refId": "A"
-        }
-      ],
-      "title": "Total Taks Uncompleted",
       "type": "stat"
     }
   ],
@@ -233,5 +177,5 @@
   "timezone": "browser",
   "title": "Just Task It",
   "uid": "df1qzui9xj75sd",
-  "version": 6
+  "version": 5
 }
