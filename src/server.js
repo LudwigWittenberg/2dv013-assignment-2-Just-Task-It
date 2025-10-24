@@ -5,9 +5,8 @@
  * @version 3.1.0
  */
 
-
 // biome-ignore assist/source/organizeImports: MUST BE FIRST!
-import  httpContext from "express-http-context"; // Must be first!
+import httpContext from "express-http-context"; // Must be first!
 import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -133,4 +132,5 @@ try {
 } catch (err) {
 	logger.error(err.message, { error: err });
 	process.exitCode = 1;
+	process.exit(1);
 }

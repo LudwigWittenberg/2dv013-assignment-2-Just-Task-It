@@ -13,9 +13,10 @@ async function connectRabbitMq(connectionString) {
 				return;
 			}
 
-			connection.on("error", (err) =>
-				logger.error("RabbitMQ conn error: " + err.message),
-			);
+			connection.on("error", (err) => {
+				logger.error("RabbitMQ conn error: " + err.message);
+				reject(err);
+			});
 
 			connection.on("close", () => {
 				logger.info("RabbitMQ conn closed");
@@ -35,14 +36,24 @@ async function connectRabbitMq(connectionString) {
 
 				const QUEUE = process.env.RABBIT_QUEUE;
 
-				channel.assertQueue(QUEUE, {
-					durable: true,
-					arguments: {
-						"x-queue-type": "quorum",
+				channel.assertQueue(
+					QUEUE,
+					{
+						durable: true,
+						arguments: {
+							"x-queue-type": "quorum",
+						},
 					},
-				});
-
-				resolve(connection);
+					(err, ok) => {
+						if (err) {
+							logger.error("RabbitMQ queue assertion error: " + err.message);
+							reject(err);
+							return;
+						}
+						logger.info("RabbitMQ queue asserted");
+						resolve(connection);
+					},
+				);
 			});
 		});
 	});

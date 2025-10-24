@@ -200,3 +200,4 @@ $RECYCLE.BIN/
 
 /logs
 /volumes
+/k8s/development/kompose/*.yaml

@@ -36,6 +36,13 @@ WORKDIR /usr/src/app
 # Copy the node_modules from the base stage. (No need to copy the application code becasuse the application code is mounted as a volume.)
 COPY --from=base --chown=node:node /usr/src/app/node_modules /usr/src/app/node_modules
 
+# Copy the application source code and other necessary files
+COPY --chown=node:node . .
+
+RUN echo "COPY DONE"
+RUN ls -la
+
+
 # Sets the user that the Docker container runs as. In this case, it's set to 'node' to avoid running as root for security reasons.
 USER node
 
