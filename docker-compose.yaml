@@ -32,11 +32,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-admin}
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   influxdb: 
     image: influxdb:latest
@@ -64,9 +59,12 @@ services:
     image: telegraf:latest
     container_name: telegraf
     depends_on:
-      - influxdb
-      - rabbit
-      - just-task-it
+      influxdb:
+        condition: service_started
+      rabbit:
+        condition: service_healthy
+      just-task-it:
+        condition: service_started
       # Need to wait for the JTI application to start
     restart: on-failure
     environment:

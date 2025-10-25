@@ -22,15 +22,15 @@ echo "✅ Kubernetes cluster is accessible"
 
 # Build the Docker image
 echo "🐳 Building Docker image..."
-cd ../../ && docker build -f Dockerfile.development -t just-task-it:latest .
+cd ../../ && docker build -f Dockerfile.production -t just-task-it:latest .
 
 # Convert docker-compose.yaml to kubernetes deployment
 echo "🔄 Converting docker-compose.yaml to kubernetes deployment..."
-kompose convert -f docker-compose.yaml -f docker-compose.development.yaml -o ./k8s/development/kompose/
+kompose convert -f docker-compose.yaml -f docker-compose.production.yaml -o ./k8s/local/kompose/
 
 # For Docker Desktop, the image is automatically available to Kubernetes
 echo "📦 Image built successfully and available to Docker Desktop Kubernetes"
-cd k8s/development
+cd k8s/local
 
 # Create namespace
 echo "📦 Creating namespace..."
@@ -43,6 +43,7 @@ kubectl apply -n just-task-it -f ./kompose/
 # Apply services
 echo "🌐 Applying services..."
 kubectl apply -n just-task-it -f ingress.yaml
+kubectl apply -n just-task-it -f docker-desktop-ingress.yaml
 
 echo "✅ Deployment completed!"
 

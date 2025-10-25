@@ -51,6 +51,9 @@ WORKDIR /usr/src/app
 COPY --from=base --chown=node:node /usr/src/app/node_modules /usr/src/app/node_modules
 COPY --chown=node:node . /usr/src/app/
 
+# Create logs directory with proper permissions for the application
+RUN mkdir -p logs/just-task-it && chown -R node:node logs
+
 # Set the user that the Docker container runs as. In this case, it's set to
 # 'node' to avoid running as root for security reasons.
 USER node
