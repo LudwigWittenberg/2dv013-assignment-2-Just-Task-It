@@ -47,13 +47,12 @@ services:
       - INFLUXD_PASSWORD=${INFLUXD_PASSWORD:-admin}
       - INFLUXD_RETENTION=${INFLUXD_RETENTION:-0}
       - INFLUXD_ADMIN_TOKEN=${INFLUXD_ADMIN_TOKEN:-my-super-secret-token}
-      # TODO CHANGE THIS TO ENVIROMENT VARIABLES
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=admin123
-      - DOCKER_INFLUXDB_INIT_ORG=jti-org
-      - DOCKER_INFLUXDB_INIT_BUCKET=jti-bucket
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-token
+      - DOCKER_INFLUXDB_INIT_MODE=${DOCKER_INFLUXDB_INIT_MODE:-setup}
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXD_USERNAME:-admin}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXD_PASSWORD:-admin123}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXD_ORG:-jti-org}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXD_BUCKET:-jti-bucket}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXD_ADMIN_TOKEN:-my-super-secret-token}
 
   telegraf:
     image: telegraf:latest
@@ -71,10 +70,10 @@ services:
       - RABBITMQ_USER=${RABBITMQ_USER:-admin}
       - RABBITMQ_PASS=${RABBITMQ_PASS:-admin}
       - RABBIT_QUEUE=${RABBIT_QUEUE:-jti-queue}
-      - INFLUX_TOKEN=${INFLUX_TOKEN:-my-super-secret-token}
+      - INFLUX_TOKEN=${INFLUXD_ADMIN_TOKEN:-my-super-secret-token}
       - INFLUX_URL=${INFLUX_URL:-http://influxdb:8086}
-      - INFLUX_ORG=${INFLUX_ORG:-jti-org}
-      - INFLUX_BUCKET=${INFLUX_BUCKET:-jti-bucket}
+      - INFLUX_ORG=${INFLUXD_ORG:-jti-org}
+      - INFLUX_BUCKET=${INFLUXD_BUCKET:-jti-bucket}
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
 
