@@ -17,8 +17,8 @@ on:
 env:
   PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
   GKE_CLUSTER: ${{ vars.GKE_CLUSTER_NAME }}
-  GKE_ZONE: ${{ vars.GKE_ZONE }}
-  DEPLOYMENT_NAME: ${{ vars.DEPLOYMENT_NAME }}
+  GKE_ZONE: ${{ vars.REGION }}
+  DEPLOYMENT_NAME: ${{ vars.GKE_CLUSTER_NAME }}
   IMAGE: ${{ vars.IMAGE }}
 
 jobs:
