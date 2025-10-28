@@ -45,6 +45,7 @@ jobs:
       with:
         cluster_name: ${{ vars.GCP_CLUSTER_NAME }}
         location: ${{ vars.REGION }}
+        project_id: ${{ vars.GCP_PROJECT_ID }}
         credentials: ${{ secrets.SERVICE_GOOGLE_CREDENTIALS }}
 
     # Build the Docker image
