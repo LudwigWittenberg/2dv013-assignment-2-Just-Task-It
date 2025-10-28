@@ -1,10 +1,10 @@
-name: Terraform Build
+name: Terraform Deploy
 
 on:
   workflow_dispatch:
 
 jobs:
-  terraform-build-staging:
+  terraform-deploy-staging:
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -36,21 +36,21 @@ jobs:
       - name: Terraform init
         run: |
           terraform init -backend-config="bucket=${GCP_BUCKET_NAME}"
-        working-directory: Terraform/Staging
+        working-directory: k8s/gke/staging
         env:
           GCP_BUCKET_NAME: ${{ vars.GCP_BUCKET_NAME }}
 
       - name: Terraform plan
         run: |
           terraform plan -out=tfplan
-        working-directory: Terraform/Staging
+        working-directory: k8s/gke/staging
 
       - name: Terraform apply
         run: |
           terraform apply -auto-approve tfplan
-        working-directory: Terraform/Staging
+        working-directory: k8s/gke/staging
 
-  terraform-build-production:
+  terraform-deploy-production:
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -78,20 +78,20 @@ jobs:
           echo "TF_VAR_project_name=${GCP_PROJECT_NAME}" >> $GITHUB_ENV
           echo "TF_VAR_bucket_name=${GCP_BUCKET_NAME}" >> $GITHUB_ENV
           echo "TF_VAR_cluster_name=${GCP_CLUSTER_NAME}" >> $GITHUB_ENV
-          
+
       - name: Terraform init
         run: |
           terraform init -backend-config="bucket=${GCP_BUCKET_NAME}"
-        working-directory: Terraform/Production
+        working-directory: k8s/gke/production
         env:
           GCP_BUCKET_NAME: ${{ vars.GCP_BUCKET_NAME }}
 
       - name: Terraform plan
         run: |
           terraform plan -out=tfplan
-        working-directory: Terraform/Production
+        working-directory: k8s/gke/production
 
       - name: Terraform apply
         run: |
           terraform apply -auto-approve tfplan
-        working-directory: Terraform/Production
+        working-directory: k8s/gke/production
