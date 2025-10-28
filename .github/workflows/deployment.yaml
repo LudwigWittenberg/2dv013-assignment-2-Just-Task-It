@@ -64,7 +64,7 @@ jobs:
 
     - name: Install Kompose
       run: |-
-        curl -L https://github.com/kubernetes/kompose/releases/download/v1.23.0/kompose-linux-amd64 -o kompose -o kompose
+        curl -L https://github.com/kubernetes/kompose/releases/download/v1.23.0/kompose-linux-amd64 -o kompose
         chmod +x ./kompose
 
     - name: Convert Docker Compose to Kubernetes YAML
@@ -94,7 +94,7 @@ jobs:
         RABBIT_CONNECTION_STRING: ${{ vars.RABBIT_CONNECTION_STRING }}
         REDIS_URL: ${{ vars.REDIS_URL }}
       run: |-
-        kompose -f .\docker-compose.yaml -f .\docker-compose.production.yaml convert -o .\k8s\gke\kompose\
+        ./kompose -f .\docker-compose.yaml -f .\docker-compose.production.yaml convert -o .\k8s\gke\kompose\
 
     # Set up kustomize
     - name: Set up Kustomize
