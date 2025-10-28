@@ -25,7 +25,7 @@ jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
-    environment: production
+    environment: staging
 
     steps:
     - name: Checkout
@@ -94,7 +94,7 @@ jobs:
         DB_CONNECTION_STRING: ${{ vars.DB_CONNECTION_STRING }}
         RABBIT_CONNECTION_STRING: ${{ vars.RABBIT_CONNECTION_STRING }}
         REDIS_URL: ${{ vars.REDIS_URL }}
-        
+
       run: |-
         ./kompose convert -f docker-compose.yaml -o k8s/gke/kompose/
 
