@@ -112,6 +112,7 @@ jobs:
       run: |-
         sed -i 's|image: just-task-it:.*|image: gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA|g' k8s/gke/kompose/*.yaml
         sed -i '/hostPort/d' k8s/gke/kompose/*.yaml
+        sed -i 's/^[[:space:]]*- port:/  - name: port\n        port:/' k8s/gke/kompose/*service*.yaml
 
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
