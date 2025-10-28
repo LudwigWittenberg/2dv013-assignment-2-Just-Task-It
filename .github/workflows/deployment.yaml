@@ -94,7 +94,7 @@ jobs:
         RABBIT_CONNECTION_STRING: ${{ vars.RABBIT_CONNECTION_STRING }}
         REDIS_URL: ${{ vars.REDIS_URL }}
       run: |-
-        ./kompose -f .\docker-compose.yaml -f .\docker-compose.production.yaml convert -o .\k8s\gke\kompose\
+        ./kompose -f docker-compose.yaml -f docker-compose.production.yaml convert -o k8s\gke\kompose\
 
     # Set up kustomize
     - name: Set up Kustomize
