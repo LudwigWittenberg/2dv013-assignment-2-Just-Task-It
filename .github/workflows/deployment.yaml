@@ -96,11 +96,23 @@ jobs:
       run: |-
         ./kompose -f docker-compose.yaml -f docker-compose.production.yaml convert -o k8s/gke/kompose/
 
+    - name: Upload kompose artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: kompose-output
+        path: k8s/gke/kompose/
+
     # Set up Kustomize
     - name: Set up Kustomize
       run: |-
         curl -sfLo ./kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
         chmod u+x ./kustomize
+
+    - name: Download kompose artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: kompose-output
+        path: k8s/gke/kompose/
 
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
