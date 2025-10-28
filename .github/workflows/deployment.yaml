@@ -64,7 +64,7 @@ jobs:
 
     - name: Install Kompose
       run: |-
-        curl -L https://github.com/kubernetes/kompose/releases/download/v1.23.0/kompose-linux-amd64 -o kompose
+        curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
         chmod +x ./kompose
 
     - name: Convert Docker Compose to Kubernetes YAML
