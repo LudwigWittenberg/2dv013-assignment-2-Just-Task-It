@@ -111,6 +111,7 @@ jobs:
     - name: Update image name in kompose files
       run: |-
         sed -i 's|image: just-task-it:.*|image: gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA|g' k8s/gke/kompose/*.yaml
+        sed -i '/hostPort/d' k8s/gke/kompose/*.yaml
 
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
