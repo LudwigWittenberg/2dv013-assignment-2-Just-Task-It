@@ -92,7 +92,10 @@ steps:
         gcloud container clusters get-credentials ${_CLUSTER_NAME} --region ${_LOCATION}
         kubectl delete pod/just-task-it -n ${_NAMESPACE} --ignore-not-found || true
         kubectl apply -f gke/generated/ --namespace=${_NAMESPACE}
-        sleep 30
+        sleep 10
+        # Fix grafana permissions - add fsGroup so it can write to volumes
+        kubectl patch deployment grafana -n ${_NAMESPACE} -p '{"spec":{"template":{"spec":{"securityContext":{"fsGroup":472}}}}}' --type merge || true
+        sleep 10
         echo "=== POD STATUS ==="
         kubectl -n ${_NAMESPACE} get pods -o wide || true
         echo "=== EVENTS ==="
