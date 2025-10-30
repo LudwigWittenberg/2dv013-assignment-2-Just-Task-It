@@ -43,6 +43,7 @@ steps:
       - |
         sed -i "s|just-task-it:latest|${_IMAGE_NAME}|g" gke/generated/komposed.yaml
         sed -i '/hostPort/d' gke/generated/komposed.yaml
+        sed -i 's/imagePullPolicy: Never/imagePullPolicy: Always/g' gke/generated/komposed.yaml
         awk '/port:/ && !/name:/ {gsub(/^[[:space:]]*- port:/, "  - name: port\n    port:"); print; next} {print}' gke/generated/komposed.yaml > gke/generated/komposed.tmp && mv gke/generated/komposed.tmp gke/generated/komposed.yaml
 
   # Cleanup previous gke-deploy outputs to avoid conflicts
@@ -97,3 +98,9 @@ steps:
         kubectl -n ${_NAMESPACE} describe pod just-task-it || true
         echo "=== POD LOGS ==="
         kubectl -n ${_NAMESPACE} logs pod/just-task-it --all-containers || true
+        echo ""
+        echo "=== GRAFANA LOGS ==="
+        kubectl -n ${_NAMESPACE} logs deployment/grafana --all-containers --tail=100 || true
+        echo ""
+        echo "=== TELEGRAF LOGS ==="
+        kubectl -n ${_NAMESPACE} logs pod/telegraf --all-containers --tail=100 || true
