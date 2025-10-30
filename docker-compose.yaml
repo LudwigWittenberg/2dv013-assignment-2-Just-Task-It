@@ -57,10 +57,7 @@ services:
   telegraf:
     image: telegraf:latest
     container_name: telegraf
-    # Run telegraf directly to avoid entrypoint setpriv issues
-    entrypoint: ["telegraf"]
-    command: ["--config", "/etc/telegraf/telegraf.conf"]
-    user: "0:0"
+    user: "999:999"
     cap_add:
       - NET_RAW
       - SETUID
