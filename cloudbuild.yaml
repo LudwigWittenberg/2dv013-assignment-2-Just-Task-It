@@ -45,7 +45,7 @@ steps:
         sed -i '/hostPort/d' gke/generated/komposed.yaml
         sed -i 's/imagePullPolicy: Never/imagePullPolicy: Always/g' gke/generated/komposed.yaml
         awk '/port:/ && !/name:/ {gsub(/^[[:space:]]*- port:/, "  - name: port\n    port:"); print; next} {print}' gke/generated/komposed.yaml > gke/generated/komposed.tmp && mv gke/generated/komposed.tmp gke/generated/komposed.yaml
-        sed -i '/name: grafana/a\        securityContext:\n          fsGroup: 472\n          fsGroupChangePolicy: OnRootMismatch' k8s/generated/komposed.yaml
+        
 
   # Cleanup previous gke-deploy outputs to avoid conflicts
   - name: 'gcr.io/cloud-builders/gcloud'
