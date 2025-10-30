@@ -57,9 +57,15 @@ services:
   telegraf:
     image: telegraf:latest
     container_name: telegraf
-    user: telegraf
+    user: "999:999"
     entrypoint: ["/usr/bin/telegraf"]
     command: ["--config", "/etc/telegraf/telegraf.conf"]
+    read_only: true              
+    security_opt:
+      - no-new-privileges:true
+      - label:disable
+    cap_drop:
+      - ALL     
     depends_on:
       influxdb:
         condition: service_started
