@@ -24,7 +24,6 @@ steps:
       - |
         curl -L https://github.com/kubernetes/kompose/releases/download/v1.37.0/kompose-linux-amd64 -o kompose
         chmod +x kompose
-        mv ./kompose /workspace/kompose
 
   # 3) Konvertera docker-compose → manifester
   #    Vi skriver allt till ETT yaml-dokument (kind: List) så det är lätt att applicera.
