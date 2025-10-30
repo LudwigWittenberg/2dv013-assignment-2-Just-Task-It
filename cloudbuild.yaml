@@ -10,7 +10,7 @@ substitutions:
 steps:
   # Step 1: Build Docker image with SHA-based tagging
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '${_IMAGE_NAME}', '.']
+    args: ['build', '-f', 'Dockerfile.production', '-t', '${_IMAGE_NAME}', '.']
 
   # Step 2: Push Docker image to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
