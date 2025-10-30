@@ -58,6 +58,8 @@ services:
     image: telegraf:latest
     container_name: telegraf
     user: telegraf
+    entrypoint: ["/usr/bin/telegraf"]
+    command: ["--config", "/etc/telegraf/telegraf.conf"]
     depends_on:
       influxdb:
         condition: service_started
@@ -75,8 +77,6 @@ services:
       - INFLUX_URL=${INFLUX_URL:-http://influxdb:8086}
       - INFLUX_ORG=${INFLUXD_ORG:-jti-org}
       - INFLUX_BUCKET=${INFLUXD_BUCKET:-jti-bucket}
-    ports:
-      - "9273:9273"  # valfritt för att se Telegrafs egna metrics lokalt
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     # Viktigt för GKE Autopilot-kompatibilitet senare:
