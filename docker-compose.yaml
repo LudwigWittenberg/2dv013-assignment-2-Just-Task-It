@@ -57,13 +57,7 @@ services:
   telegraf:
     image: telegraf:latest
     container_name: telegraf
-    user: "999:999"
-    cap_add:
-      - NET_RAW
-      - SETUID
-      - SETGID
-    security_opt:
-      - no-new-privileges:false
+    privileged: true
     depends_on:
       influxdb:
         condition: service_started
