@@ -53,33 +53,32 @@ steps:
       - |
         rm -rf output || true
 
-  # 5a) Deploy FAS 1: manuella prereqs (namespace, secrets, configmaps, pvcs, crds, osv)
-  - name: "gcr.io/cloud-builders/gke-deploy"
-    args:
-      - run
-      - --location=${_LOCATION}
-      - --cluster=${_CLUSTER_NAME}
-      - --namespace=${_NAMESPACE}
-      - --filename=k8s/gke
+  # # 5a) Deploy FAS 1: manuella prereqs (namespace, secrets, configmaps, pvcs, crds, osv)
+  # - name: "gcr.io/cloud-builders/gke-deploy"
+  #   args:
+  #     - run
+  #     - --location=${_LOCATION}
+  #     - --cluster=${_CLUSTER_NAME}
+  #     - --namespace=${_NAMESPACE}
+  #     - --filename=k8s/gke
 
-  # Cleanup previous gke-deploy outputs before second deploy
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - "-c"
-      - |
-        rm -rf output || true
+  # # Cleanup previous gke-deploy outputs before second deploy
+  # - name: 'gcr.io/cloud-builders/gcloud'
+  #   entrypoint: 'bash'
+  #   args:
+  #     - "-c"
+  #     - |
+  #       rm -rf output || true
 
-  # 5b) Deploy FAS 2: kompose-genererat (och ev. övriga manuella resurser som inte är prereqs)
-  - name: "gcr.io/cloud-builders/gke-deploy"
-    args:
-      - run
-      - --image=${_IMAGE_NAME}
-      - --location=${_LOCATION}
-      - --cluster=${_CLUSTER_NAME}
-      - --namespace=${_NAMESPACE}
-      - --filename=gke/generated/
-      - --timeout=900s
+  # # 5b) Deploy FAS 2: kompose-genererat (och ev. övriga manuella resurser som inte är prereqs)
+  # - name: "gcr.io/cloud-builders/gke-deploy"
+  #   args:
+  #     - run
+  #     - --image=${_IMAGE_NAME}
+  #     - --location=${_LOCATION}
+  #     - --cluster=${_CLUSTER_NAME}
+  #     - --namespace=${_NAMESPACE}
+  #     - --filename=gke/generated/
 
   # Diagnostics: show pod status, events, and logs for just-task-it
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -88,7 +87,13 @@ steps:
       - "-c"
       - |
         gcloud container clusters get-credentials ${_CLUSTER_NAME} --region ${_LOCATION}
+        kubectl apply -f gke/generated/
+        sleep 10
+        echo "=== POD STATUS ==="
         kubectl -n ${_NAMESPACE} get pods -o wide || true
-        kubectl -n ${_NAMESPACE} get events --sort-by=.lastTimestamp | tail -n 100 || true
+        echo "=== EVENTS ==="
+        kubectl -n ${_NAMESPACE} get events --sort-by=.lastTimestamp | tail -n 50 || true
+        echo "=== POD DESCRIBE ==="
         kubectl -n ${_NAMESPACE} describe pod just-task-it || true
-        kubectl -n ${_NAMESPACE} logs pod/just-task-it --all-containers --tail=200 || true
+        echo "=== POD LOGS ==="
+        kubectl -n ${_NAMESPACE} logs pod/just-task-it --all-containers || true
