@@ -1,0 +1,814 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+    kompose.volume.type: configMap
+  labels:
+    io.kompose.service: grafana
+  name: grafana
+spec:
+  ports:
+    - name: "3000"
+      port: 3000
+      targetPort: 3000
+  selector:
+    io.kompose.service: grafana
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: influxdb
+  name: influxdb
+spec:
+  ports:
+    - name: "8086"
+      port: 8086
+      targetPort: 8086
+  selector:
+    io.kompose.service: influxdb
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.image-pull-policy: Never
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: just-task-it
+  name: just-task-it
+spec:
+  ports:
+    - name: "3002"
+      port: 3002
+      targetPort: 3002
+  selector:
+    io.kompose.service: just-task-it
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: mongodb
+  name: mongodb
+spec:
+  ports:
+    - name: "27017"
+      port: 27017
+      targetPort: 27017
+  selector:
+    io.kompose.service: mongodb
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: rabbit
+  name: rabbit
+spec:
+  ports:
+    - name: "5672"
+      port: 5672
+      targetPort: 5672
+    - name: "15672"
+      port: 15672
+      targetPort: 15672
+  selector:
+    io.kompose.service: rabbit
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: redis
+  name: redis
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
+  selector:
+    io.kompose.service: redis
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+    kompose.volume.type: configMap
+  labels:
+    io.kompose.service: grafana
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: grafana
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+        kompose.version: 1.37.0 (fb0539e64)
+        kompose.volume.type: configMap
+      labels:
+        io.kompose.service: grafana
+    spec:
+      containers:
+        - env:
+            - name: GF_INSTALL_PLUGINS
+              value: grafana-influxdb-flux-datasource
+            - name: GF_PATHS_PROVISIONING
+              value: /etc/grafana/provisioning
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: admin
+            - name: GF_SECURITY_ADMIN_USER
+              value: admin
+            - name: INFLUXD_ADMIN_TOKEN
+              value: my-super-secret-token
+            - name: INFLUXD_BUCKET
+              value: jti-bucket
+            - name: INFLUXD_ORG
+              value: jti-org
+          image: grafana/grafana
+          name: grafana
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          securityContext:
+            runAsGroup: 472
+            runAsUser: 472
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana-storage
+            - mountPath: /etc/grafana/provisioning/dashboards
+              name: grafana-cm1
+              readOnly: true
+            - mountPath: /etc/grafana/provisioning/datasources
+              name: grafana-cm2
+              readOnly: true
+            - mountPath: /etc/grafana/dashboards
+              name: grafana-cm3
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: grafana-storage
+          persistentVolumeClaim:
+            claimName: grafana-storage
+        - configMap:
+            name: grafana-cm1
+          name: grafana-cm1
+        - configMap:
+            name: grafana-cm2
+          name: grafana-cm2
+        - configMap:
+            name: grafana-cm3
+          name: grafana-cm3
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: grafana-storage
+  name: grafana-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: v1
+data:
+  dashboard.yml: |
+    apiVersion: 1
+
+    providers:
+      - name: 'Just Task It'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        allowUiUpdates: true
+        options:
+          path: /etc/grafana/dashboards
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: grafana
+  name: grafana-cm1
+
+---
+apiVersion: v1
+data:
+  InfluxDB.yml: |-
+    apiVersion: 1
+
+    datasources:
+      - name: InfluxDB_v2_Flux
+        type: influxdb
+        access: proxy
+        url: http://influxdb:8086
+        jsonData:
+          version: Flux
+          organization: ${INFLUXD_ORG}
+          defaultBucket: ${INFLUXD_BUCKET}
+          tlsSkipVerify: true
+        secureJsonData:
+          token: ${INFLUXD_ADMIN_TOKEN}
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: grafana
+  name: grafana-cm2
+
+---
+apiVersion: v1
+data:
+  Just_Task_It.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 1,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 3,
+          "panels": [],
+          "title": "Tasks Overview",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "InfluxDB_v2_Flux"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-BlPu"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 1
+          },
+          "id": 1,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.6.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "InfluxDB_v2_Flux"
+              },
+              "query": "from(bucket: \"jti-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"task_events\" and\r\n    r.event_type == \"task_created\" and\r\n    r._field == \"standard_value\"\r\n  )\r\n  |> count(column: \"_value\")\r\n  |> group(columns: [])\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "Total Tasks Created",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "InfluxDB_v2_Flux"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-BlPu"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 1
+          },
+          "id": 2,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.6.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "InfluxDB_v2_Flux"
+              },
+              "query": "from(bucket: \"jti-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"task_events\" and\r\n    r.event_type == \"task_completed\" and\r\n    r._field == \"standard_value\"\r\n  )\r\n  |> count(column: \"_value\")\r\n  |> group(columns: [])\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "Total Tasks Completed",
+          "type": "stat"
+        }
+      ],
+      "preload": false,
+      "schemaVersion": 41,
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-24h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Just Task It",
+      "uid": "df1qzui9xj75sd",
+      "version": 5
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: grafana
+  name: grafana-cm3
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: influxdb
+  name: influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: influxdb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: influxdb
+    spec:
+      containers:
+        - env:
+            - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+              value: my-super-secret-token
+            - name: DOCKER_INFLUXDB_INIT_BUCKET
+              value: jti-bucket
+            - name: DOCKER_INFLUXDB_INIT_MODE
+              value: setup
+            - name: DOCKER_INFLUXDB_INIT_ORG
+              value: jti-org
+            - name: DOCKER_INFLUXDB_INIT_PASSWORD
+              value: admin123
+            - name: DOCKER_INFLUXDB_INIT_USERNAME
+              value: admin
+            - name: INFLUXD_ADMIN_TOKEN
+              value: my-super-secret-token
+            - name: INFLUXD_BUCKET
+              value: jti-bucket
+            - name: INFLUXD_ORG
+              value: jti-org
+            - name: INFLUXD_PASSWORD
+              value: admin
+            - name: INFLUXD_RETENTION
+              value: "0"
+            - name: INFLUXD_USERNAME
+              value: admin
+          image: influxdb:latest
+          name: influxdb
+          ports:
+            - containerPort: 8086
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/influxdb
+              name: influxdb-data
+      restartPolicy: Always
+      volumes:
+        - name: influxdb-data
+          persistentVolumeClaim:
+            claimName: influxdb-data
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: influxdb-data
+  name: influxdb-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.image-pull-policy: Never
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: just-task-it
+  name: just-task-it
+spec:
+  containers:
+    - env:
+        - name: BASE_URL
+          value: /
+        - name: DB_CONNECTION_STRING
+          value: mongodb://mongodb:27017/just-task-it
+        - name: LOGGER_COMBINED_LOG_FILE
+          value: logs/just-task-it/combined.log
+        - name: LOGGER_ERROR_LOG_FILE
+          value: logs/just-task-it/error.log
+        - name: LOGGER_MORGAN_FORMAT_ADD_REMOTE
+          value: "true"
+        - name: LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE
+          value: logs//just-task-it/uncaught-exception.log
+        - name: LOG_LEVEL
+          value: info
+        - name: NODE_ENV
+          value: production
+        - name: PORT
+          value: "3002"
+        - name: RABBIT_CONNECTION_STRING
+          value: amqp://admin:admin@rabbit:5672
+        - name: RABBIT_QUEUE
+          value: jti-queue
+        - name: REDIS_URL
+          value: redis://redis:6379
+        - name: SESSION_NAME
+          value: 2dv013-k8s-just-task-it
+        - name: SESSION_SECRET
+          value: secret
+      image: just-task-it:latest
+      imagePullPolicy: Never
+      name: just-task-it
+      ports:
+        - containerPort: 3002
+          protocol: TCP
+  restartPolicy: OnFailure
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: mongodb
+  name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mongodb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: mongodb
+    spec:
+      containers:
+        - image: mongo:8.0.0
+          name: mongodb-jti
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /volumes/mongodb
+              name: mongo-storage
+      restartPolicy: Always
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: mongo-storage
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: mongo-storage
+  name: mongo-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: rabbit
+  name: rabbit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: rabbit
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: rabbit
+    spec:
+      containers:
+        - env:
+            - name: RABBITMQ_DEFAULT_PASS
+              value: admin
+            - name: RABBITMQ_DEFAULT_USER
+              value: admin
+          image: rabbitmq:4-management
+          name: rabbit
+          ports:
+            - containerPort: 5672
+              protocol: TCP
+            - containerPort: 15672
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: redis
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: redis
+    spec:
+      containers:
+        - image: redis:latest
+          name: redis
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /volumes/redis
+              name: redis-storage
+      restartPolicy: Always
+      volumes:
+        - name: redis-storage
+          persistentVolumeClaim:
+            claimName: redis-storage
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: redis-storage
+  name: redis-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: C:\Kompose\kompose.exe convert -f docker-compose.yaml -f docker-compose.production.yaml -o .\k8s\gke\kompose\kompose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: telegraf
+  name: telegraf
+spec:
+  containers:
+    - args:
+        - --config
+        - /etc/telegraf/telegraf.conf
+      command:
+        - /usr/bin/telegraf
+      env:
+        - name: INFLUX_BUCKET
+          value: jti-bucket
+        - name: INFLUX_ORG
+          value: jti-org
+        - name: INFLUX_TOKEN
+          value: my-super-secret-token
+        - name: INFLUX_URL
+          value: http://influxdb:8086
+        - name: RABBITMQ_PASS
+          value: admin
+        - name: RABBITMQ_USER
+          value: admin
+        - name: RABBIT_HOST
+          value: rabbit
+        - name: RABBIT_QUEUE
+          value: jti-queue
+      image: telegraf:latest
+      name: telegraf
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsGroup: 999
+        runAsUser: 999
+      volumeMounts:
+        - mountPath: /etc/telegraf/telegraf.conf
+          name: telegraf-cm0
+          readOnly: true
+          subPath: telegraf.conf
+  restartPolicy: OnFailure
+  volumes:
+    - configMap:
+        items:
+          - key: telegraf.conf
+            path: telegraf.conf
+        name: telegraf-cm0
+      name: telegraf-cm0
+
+---
+apiVersion: v1
+data:
+  telegraf.conf: |-
+    [agent]
+      interval = "10s"
+      round_interval = true
+      flush_interval = "10s"
+      flush_jitter = "0s"
+      precision = "0s"
+      hostname = "jti-client"
+      omit_hostname = false
+      debug = true
+      logfile = ""
+
+    [[inputs.amqp_consumer]]
+      brokers = ["amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbit:5672/%2F"]
+      queue_passive = true
+      exchange = "telegraf"
+      queue = "${RABBIT_QUEUE}"
+      queue_durability = "durable"
+      binding_key = "#"
+      data_format = "json"
+      tag_keys = ["event_type"]
+      json_time_key    = "timestamp"
+      json_time_format = "RFC3339"
+      name_override = "task_events"
+
+    [[outputs.influxdb_v2]]
+      urls = ["$INFLUX_URL"]
+      token = "$INFLUX_TOKEN"
+      organization = "$INFLUX_ORG"
+      bucket = "$INFLUX_BUCKET"
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    io.kompose.service: telegraf
+  name: telegraf-cm0
+
