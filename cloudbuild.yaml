@@ -1,1 +1,64 @@
-steps
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _IMAGE_NAME: "gcr.io/${PROJECT_ID}/gcpdevops-prod:${SHORT_SHA}"
+  _CLUSTER_NAME: "lnu-jti-production-autopilot-cluster"
+  _NAMESPACE: "just-task-it"
+  _LOCATION: "europe-north2"
+
+steps:
+  # Step 1: Build Docker image with SHA-based tagging
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_IMAGE_NAME}', '.']
+
+  # Step 2: Push Docker image to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_IMAGE_NAME}']
+
+    # 2) Installera Kompose (binär från GitHub release)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        curl -L https://github.com/kubernetes/kompose/releases/download/v1.37.0/kompose-linux-amd64 -o kompose
+        chmod +x kompose
+        mv ./kompose /workspace/kompose
+
+  # 3) Konvertera docker-compose → manifester
+  #    Vi skriver allt till ETT yaml-dokument (kind: List) så det är lätt att applicera.
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        mkdir -p gke/generated
+        /workspace/kompose convert -f docker-compose.yaml -f docker-compose.production.yaml --stdout > gke/generated/komposed.yaml
+
+    # Step 3: Replace placeholder `just-task-it:latest` in `komposed.yaml` with actual image name 
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - "-c"
+      - |
+        sed -i "s|just-task-it:latest|${_IMAGE_NAME}|g" gke/generated/komposed.yaml
+
+  # 5a) Deploy FAS 1: manuella prereqs (namespace, secrets, configmaps, pvcs, crds, osv)
+  - name: "gcr.io/cloud-builders/gke-deploy"
+    args:
+      - run
+      - --location=${_LOCATION}
+      - --cluster=${_CLUSTER_NAME}
+      - --namespace=${_NAMESPACE}
+      - --filename=k8s/gke
+
+  # 5b) Deploy FAS 2: kompose-genererat (och ev. övriga manuella resurser som inte är prereqs)
+  - name: "gcr.io/cloud-builders/gke-deploy"
+    args:
+      - run
+      - --image=${_IMAGE_NAME}
+      - --location=${_LOCATION}
+      - --cluster=${_CLUSTER_NAME}
+      - --namespace=${_NAMESPACE}
+      - --filename=gke/generated/
