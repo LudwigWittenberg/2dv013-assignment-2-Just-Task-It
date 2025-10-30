@@ -45,6 +45,14 @@ steps:
         sed -i '/hostPort/d' gke/generated/komposed.yaml
         awk '/port:/ && !/name:/ {gsub(/^[[:space:]]*- port:/, "  - name: port\n    port:"); print; next} {print}' gke/generated/komposed.yaml > gke/generated/komposed.tmp && mv gke/generated/komposed.tmp gke/generated/komposed.yaml
 
+  # Cleanup previous gke-deploy outputs to avoid conflicts
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - "-c"
+      - |
+        rm -rf output || true
+
   # 5a) Deploy FAS 1: manuella prereqs (namespace, secrets, configmaps, pvcs, crds, osv)
   - name: "gcr.io/cloud-builders/gke-deploy"
     args:
