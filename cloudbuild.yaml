@@ -42,6 +42,7 @@ steps:
       - "-c"
       - |
         sed -i "s|just-task-it:latest|${_IMAGE_NAME}|g" gke/generated/komposed.yaml
+        sed -i '/hostPort/d' gke/generated/komposed.yaml
 
   # 5a) Deploy FAS 1: manuella prereqs (namespace, secrets, configmaps, pvcs, crds, osv)
   - name: "gcr.io/cloud-builders/gke-deploy"
