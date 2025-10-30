@@ -54,14 +54,14 @@ steps:
       - |
         rm -rf output || true
 
-  # # 5a) Deploy FAS 1: manuella prereqs (namespace, secrets, configmaps, pvcs, crds, osv)
-  # - name: "gcr.io/cloud-builders/gke-deploy"
-  #   args:
-  #     - run
-  #     - --location=${_LOCATION}
-  #     - --cluster=${_CLUSTER_NAME}
-  #     - --namespace=${_NAMESPACE}
-  #     - --filename=k8s/gke
+  # 5a) Deploy FAS 1: manuella prereqs (namespace, secrets, configmaps, pvcs, crds, osv)
+  - name: "gcr.io/cloud-builders/gke-deploy"
+    args:
+      - run
+      - --location=${_LOCATION}
+      - --cluster=${_CLUSTER_NAME}
+      - --namespace=${_NAMESPACE}
+      - --filename=k8s/gke
 
   # # Cleanup previous gke-deploy outputs before second deploy
   # - name: 'gcr.io/cloud-builders/gcloud'
@@ -89,8 +89,8 @@ steps:
       - |
         gcloud container clusters get-credentials ${_CLUSTER_NAME} --region ${_LOCATION}
         kubectl delete pod/just-task-it -n ${_NAMESPACE} --ignore-not-found || true
-        kubectl apply -f gke/generated/
-        sleep 10
+        kubectl apply -f gke/generated/ --namespace=${_NAMESPACE}
+        sleep 30
         echo "=== POD STATUS ==="
         kubectl -n ${_NAMESPACE} get pods -o wide || true
         echo "=== EVENTS ==="
