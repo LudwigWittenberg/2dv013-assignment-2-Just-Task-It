@@ -30,3 +30,20 @@ spec:
   ports:
   - port: 80
     targetPort: 3002
+
+# Docker Desktop Kubernetes - Simple NodePort Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-nodeport
+  namespace: just-task-it
+  labels:
+    app: grafana
+spec:
+  type: NodePort
+  selector:
+    io.kompose.service: grafana
+  ports:
+  - port: 80
+    targetPort: 3000
+    nodePort: 30081  # Access via localhost:30081
