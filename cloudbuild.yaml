@@ -45,6 +45,10 @@ steps:
         sed -i '/hostPort/d' gke/generated/komposed.yaml
         sed -i 's/imagePullPolicy: Never/imagePullPolicy: Always/g' gke/generated/komposed.yaml
         awk '/port:/ && !/name:/ {gsub(/^[[:space:]]*- port:/, "  - name: port\n    port:"); print; next} {print}' gke/generated/komposed.yaml > gke/generated/komposed.tmp && mv gke/generated/komposed.tmp gke/generated/komposed.yaml
+        sed -i 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' gke/generated/komposed.yaml
+        sed -i '/kind: Pod/,/^---$/ { /name: telegraf/,/^  - name:/ { s/readOnlyRootFilesystem: true/readOnlyRootFilesystem: false/; /securityContext:/a\        runAsUser: 0\n        capabilities:\n          add:\n          - SYS_ADMIN
+        }
+        }' gke/generated/komposed.yaml
         
 
   # Cleanup previous gke-deploy outputs to avoid conflicts
@@ -116,6 +120,12 @@ steps:
         echo ""
         echo "=== DEPLOYMENT COMPLETE ==="
         echo "Just-Task-It is running at: http://\$(kubectl -n ${_NAMESPACE} get svc just-task-it-loadbalancer -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):80"
+        kubectl apply -f k8s/gke/grafana-service.yaml
+        sleep 10
+        echo "Grafana is running at: http://\$(kubectl -n ${_NAMESPACE} get svc grafana-loadbalancer -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):3000"
         echo ""
         echo "=== FINAL POD STATUS ==="
         kubectl -n ${_NAMESPACE} get pods -o wide || true
+        echo ""
+        echo "=== SERVICES ==="
+        kubectl -n ${_NAMESPACE} get svc -o wide || true
