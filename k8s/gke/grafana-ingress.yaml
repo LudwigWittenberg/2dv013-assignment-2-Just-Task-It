@@ -11,6 +11,6 @@ spec:
     io.kompose.service: grafana
   ports:
   - name: grafana
-    port: 3000
+    port: 80
     targetPort: 3000
     protocol: TCP

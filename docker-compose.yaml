@@ -56,9 +56,12 @@ services:
 
   telegraf:
     image: telegraf:latest
-    user: "1000:1000"
-    command: ["telegraf","--config","/etc/telegraf/telegraf.conf"]
     container_name: telegraf
+    # Run telegraf directly to avoid entrypoint setpriv issues
+    entrypoint: ["telegraf"]
+    command: ["--config", "/etc/telegraf/telegraf.conf"]
+    cap_add:
+      - NET_RAW
     depends_on:
       influxdb:
         condition: service_started
