@@ -57,7 +57,7 @@ services:
   telegraf:
     image: telegraf:latest
     container_name: telegraf
-    privileged: true
+    user: telegraf
     depends_on:
       influxdb:
         condition: service_started
