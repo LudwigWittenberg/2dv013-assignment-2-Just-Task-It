@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: telegraf
+  namespace: just-task-it
+spec:
+  containers:
+  - name: telegraf
+    securityContext:
+      allowPrivilegeEscalation: true

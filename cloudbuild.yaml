@@ -111,3 +111,12 @@ steps:
         echo ""
         echo "=== SERVICE DETAILS ==="
         kubectl -n ${_NAMESPACE} describe svc just-task-it-loadbalancer || true
+        sleep 5
+        echo ""
+        echo "=== APPLYING SECURITY PATCHES ==="
+        kubectl patch deployment grafana -n ${_NAMESPACE} --type merge --patch-file k8s/gke/grafana-fix.yaml || true
+        kubectl patch pod telegraf -n ${_NAMESPACE} --type merge --patch-file k8s/gke/telegraf-fix.yaml || true
+        sleep 10
+        echo ""
+        echo "=== FINAL POD STATUS ==="
+        kubectl -n ${_NAMESPACE} get pods -o wide || true
