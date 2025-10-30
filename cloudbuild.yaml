@@ -79,3 +79,16 @@ steps:
       - --cluster=${_CLUSTER_NAME}
       - --namespace=${_NAMESPACE}
       - --filename=gke/generated/
+      - --timeout=900s
+
+  # Diagnostics: show pod status, events, and logs for just-task-it
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - "-c"
+      - |
+        gcloud container clusters get-credentials ${_CLUSTER_NAME} --region ${_LOCATION}
+        kubectl -n ${_NAMESPACE} get pods -o wide || true
+        kubectl -n ${_NAMESPACE} get events --sort-by=.lastTimestamp | tail -n 100 || true
+        kubectl -n ${_NAMESPACE} describe pod just-task-it || true
+        kubectl -n ${_NAMESPACE} logs pod/just-task-it --all-containers --tail=200 || true
