@@ -45,6 +45,7 @@ steps:
         sed -i '/hostPort/d' gke/generated/komposed.yaml
         sed -i 's/imagePullPolicy: Never/imagePullPolicy: Always/g' gke/generated/komposed.yaml
         awk '/port:/ && !/name:/ {gsub(/^[[:space:]]*- port:/, "  - name: port\n    port:"); print; next} {print}' gke/generated/komposed.yaml > gke/generated/komposed.tmp && mv gke/generated/komposed.tmp gke/generated/komposed.yaml
+        sed -i '/name: grafana/a\        securityContext:\n          fsGroup: 472\n          fsGroupChangePolicy: OnRootMismatch' k8s/generated/komposed.yaml
 
   # Cleanup previous gke-deploy outputs to avoid conflicts
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -113,10 +114,8 @@ steps:
         kubectl -n ${_NAMESPACE} describe svc just-task-it-loadbalancer || true
         sleep 5
         echo ""
-        echo "=== APPLYING SECURITY PATCHES ==="
-        kubectl patch deployment grafana -n ${_NAMESPACE} -p '{"spec":{"template":{"spec":{"securityContext":{"fsGroup":472}}}}}' --type merge || true
-        kubectl patch pod telegraf -n ${_NAMESPACE} -p '{"spec":{"containers":[{"name":"telegraf","securityContext":{"allowPrivilegeEscalation":true}}]}}' --type merge || true
-        sleep 10
+        echo "=== DEPLOYMENT COMPLETE ==="
+        echo "Just-Task-It is running at: http://\$(kubectl -n ${_NAMESPACE} get svc just-task-it-loadbalancer -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):80"
         echo ""
         echo "=== FINAL POD STATUS ==="
         kubectl -n ${_NAMESPACE} get pods -o wide || true

@@ -56,6 +56,8 @@ services:
 
   telegraf:
     image: telegraf:latest
+    user: "1000:1000"
+    command: ["telegraf","--config","/etc/telegraf/telegraf.conf"]
     container_name: telegraf
     depends_on:
       influxdb:
@@ -79,6 +81,7 @@ services:
 
   grafana:
     image: grafana/grafana
+    user: "472:472"
     container_name: grafana
     ports:
       - "3000:3000"
