@@ -81,13 +81,14 @@ steps:
   #     - --namespace=${_NAMESPACE}
   #     - --filename=gke/generated/
 
-  # Diagnostics: show pod status, events, and logs for just-task-it
+  # Apply kompose-generated resources and show diagnostics
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - "-c"
       - |
         gcloud container clusters get-credentials ${_CLUSTER_NAME} --region ${_LOCATION}
+        kubectl delete pod/just-task-it -n ${_NAMESPACE} --ignore-not-found || true
         kubectl apply -f gke/generated/
         sleep 10
         echo "=== POD STATUS ==="
