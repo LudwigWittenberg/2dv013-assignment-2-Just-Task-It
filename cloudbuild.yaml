@@ -62,6 +62,14 @@ steps:
       - --namespace=${_NAMESPACE}
       - --filename=k8s/gke
 
+  # Cleanup previous gke-deploy outputs before second deploy
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - "-c"
+      - |
+        rm -rf output || true
+
   # 5b) Deploy FAS 2: kompose-genererat (och ev. övriga manuella resurser som inte är prereqs)
   - name: "gcr.io/cloud-builders/gke-deploy"
     args:
