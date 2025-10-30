@@ -65,9 +65,9 @@ services:
         condition: service_healthy
       just-task-it:
         condition: service_started
-      # Need to wait for the JTI application to start
     restart: on-failure
     environment:
+      - RABBIT_HOST=${RABBIT_HOST:-rabbit}
       - RABBITMQ_USER=${RABBITMQ_USER:-admin}
       - RABBITMQ_PASS=${RABBITMQ_PASS:-admin}
       - RABBIT_QUEUE=${RABBIT_QUEUE:-jti-queue}
@@ -75,9 +75,12 @@ services:
       - INFLUX_URL=${INFLUX_URL:-http://influxdb:8086}
       - INFLUX_ORG=${INFLUXD_ORG:-jti-org}
       - INFLUX_BUCKET=${INFLUXD_BUCKET:-jti-bucket}
+    ports:
+      - "9273:9273"  # valfritt för att se Telegrafs egna metrics lokalt
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-
+    # Viktigt för GKE Autopilot-kompatibilitet senare:
+    # undvik privileged, hostNetwork, hostPID, hostPath, cap_add etc.
   grafana:
     image: grafana/grafana
     user: "472:472"
