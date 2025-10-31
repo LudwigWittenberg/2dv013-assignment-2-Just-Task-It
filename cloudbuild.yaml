@@ -3,7 +3,7 @@ options:
 
 substitutions:
   _IMAGE_NAME: "gcr.io/${PROJECT_ID}/gcpdevops-prod:${SHORT_SHA}"
-  _CLUSTER_NAME: "lnu-jti-staging-autopilot-cluster"
+  _CLUSTER_NAME: "lnu-jti-production-autopilot-cluster"
   _NAMESPACE: "just-task-it"
   _LOCATION: "europe-north2"
 
