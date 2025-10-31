@@ -167,38 +167,4 @@ export class UserController {
 			res.redirect("./register");
 		}
 	}
-
-	/**
-	 * Authorizes a user to access a page.
-	 *
-	 * @param { req } req - Express request object.
-	 * @param { res } res - Express response object.
-	 * @param { next } next - Express next middleware function.
-	 */
-	authorizeLogOut(req, res, next) {
-		if (!req.session.user) {
-			const error = new Error("Not Found");
-			error.status = 404;
-			next(error);
-		} else {
-			next();
-		}
-	}
-
-	/**
-	 * Authorizes a user to access a page.
-	 *
-	 * @param { req } req - Express request object.
-	 * @param { res } res - Express response object.
-	 * @param { next } next - Express next middleware function.
-	 */
-	authorizeLogIn(req, res, next) {
-		if (req.session.user) {
-			const error = new Error("Not Found");
-			error.status = 404;
-			next(error);
-		} else {
-			next();
-		}
-	}
 }
