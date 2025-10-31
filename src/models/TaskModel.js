@@ -21,6 +21,10 @@ const schema = new mongoose.Schema({
 		required: true,
 		default: false,
 	},
+	user_id: {
+		type: String,
+		required: true
+	}
 });
 
 schema.add(BASE_SCHEMA);

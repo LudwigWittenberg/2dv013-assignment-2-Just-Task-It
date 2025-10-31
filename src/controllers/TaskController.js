@@ -59,7 +59,9 @@ export class TaskController {
 			logger.silly("Loading all TaskModel documents");
 
 			const viewData = {
-				tasks: (await TaskModel.find()).map((taskDoc) => taskDoc.toObject()),
+				tasks: (await TaskModel.find({
+					user_id: req.session.user.id
+				})).map((taskDoc) => taskDoc.toObject()),
 			};
 
 			logger.silly("Loaded all TaskModel documents");
@@ -92,16 +94,19 @@ export class TaskController {
 
 			const { description, done } = req.body;
 
+			console.log(req.session.user)
+
 			const data = await TaskModel.create({
 				description,
 				done: done === "on",
+				user_id: req.session.user.id,
 			});
 
 			// Create a rabbit event
-			rabbitEvent("task_created", data);
+			rabbitEvent("task_created", data, req.session.user.username);
 
-			if (done === 'on') {
-				rabbitEvent("task_completed", data);
+			if (done === "on") {
+				rabbitEvent("task_completed", data, req.session.user.username);
 			}
 
 			logger.silly("Created new task document");
@@ -148,7 +153,7 @@ export class TaskController {
 			}
 			if ("done" in req.body) {
 				req.doc.done = req.body.done === "on";
-				rabbitEvent("task_completed", req.doc);
+				rabbitEvent("task_completed", req.doc, req.session.user.username);
 			}
 			if (req.doc.isModified()) {
 				await req.doc.save();

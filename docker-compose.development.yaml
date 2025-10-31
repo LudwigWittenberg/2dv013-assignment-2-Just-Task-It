@@ -18,7 +18,7 @@ services:
     # Mount the 'node_modules' directory in the container to avoid conflicts with the host.
     volumes:
       - ./:/usr/src/app/
-      - node_modules:/usr/src/app/node_modules
+      - /usr/src/app/node_modules
 
     # The 'env_file' directive is used to specify a file containing environment variables to be set in the container.
     # Each line in the file should be in the form VAR=VALUE.
@@ -27,5 +27,3 @@ services:
       - ./.env
 
 volumes:
-  # Defines a named volume named 'node_modules'.
-  node_modules:

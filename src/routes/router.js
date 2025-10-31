@@ -9,11 +9,13 @@ import http from "node:http";
 import express from "express";
 import { router as homeRouter } from "./homeRouter.js";
 import { router as taskRouter } from "./taskRouter.js";
+import { router as userRouter } from "./userRouter.js";
 
 export const router = express.Router();
 
 router.use("/", homeRouter);
 router.use("/tasks", taskRouter);
+router.use("/user", userRouter);
 
 // Catch 404 (ALWAYS keep this as the last route).
 router.use("*", (req, res, next) => {

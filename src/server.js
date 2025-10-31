@@ -86,6 +86,10 @@ try {
 			delete req.session.flash;
 		}
 
+		if (req.session.user) {
+			res.locals.user = req.session.user;
+		}
+
 		// Pass the base URL to the views.
 		res.locals.baseURL = baseURL;
 
