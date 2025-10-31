@@ -17,10 +17,12 @@
       <td class="w-100 <% if (task.done) { %> text-muted <% } %>">
         <%= task.description %>
       </td>
+      <% if (task.user_id === locals.user.id) { %>
       <td class="text-nowrap">
         <a href="./tasks/<%= task.id %>/update">Update</a>
         <a href="./tasks/<%= task.id %>/delete">Delete</a>
       </td>
+      <% } %>
     </tr>
     <% } %>
     <% } else { %>
