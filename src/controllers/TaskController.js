@@ -103,10 +103,10 @@ export class TaskController {
 			});
 
 			// Create a rabbit event
-			rabbitEvent("task_created", data);
+			rabbitEvent("task_created", data, req.session.user.username);
 
 			if (done === "on") {
-				rabbitEvent("task_completed", data);
+				rabbitEvent("task_completed", data, req.session.user.username);
 			}
 
 			logger.silly("Created new task document");
@@ -153,7 +153,7 @@ export class TaskController {
 			}
 			if ("done" in req.body) {
 				req.doc.done = req.body.done === "on";
-				rabbitEvent("task_completed", req.doc);
+				rabbitEvent("task_completed", req.doc, req.session.user.username);
 			}
 			if (req.doc.isModified()) {
 				await req.doc.save();
