@@ -20,7 +20,7 @@ export class UserController {
 	 */
 	login(req, res, next) {
 		try {
-			res.render("login/index");
+			res.render("user/login");
 		} catch (error) {
 			next(error);
 		}
@@ -54,7 +54,7 @@ export class UserController {
 					text: "You are now logged in",
 				};
 
-				res.redirect("./");
+				res.redirect("../");
 			});
 		} catch (error) {
 			console.log(error);
@@ -62,7 +62,7 @@ export class UserController {
 				type: "danger",
 				text: "Wrong username or password",
 			};
-			res.redirect("./login");
+			res.redirect("../user/login");
 		}
 	}
 
@@ -84,7 +84,7 @@ export class UserController {
 
 				res.clearCookie(process.env.SESSION_NAME);
 
-				res.redirect("./");
+				res.redirect("../");
 			});
 		} catch (error) {
 			next(error);
@@ -100,7 +100,7 @@ export class UserController {
 	 */
 	register(req, res, next) {
 		try {
-			res.render("register/index");
+			res.render("user/register");
 		} catch (error) {
 			next(error);
 		}
@@ -126,7 +126,7 @@ export class UserController {
 					text: "Username already exists",
 				};
 
-				return res.redirect("./register");
+				return res.redirect("./user/register");
 			}
 
 			if (password.length < 8) {
@@ -144,7 +144,7 @@ export class UserController {
 					text: "Passwords do not match",
 				};
 
-				return res.redirect("./register");
+				return res.redirect("./user/register");
 			}
 
 			await UserModel.create({
@@ -164,7 +164,7 @@ export class UserController {
 				type: "danger",
 				text: "There was an error while creating your account",
 			};
-			res.redirect("./register");
+			res.redirect("./user/register");
 		}
 	}
 }

@@ -13,8 +13,17 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
           <a class="nav-link" href="./">Home</a>
-          <a class="nav-link" href="./tasks">List</a>
-          <a class="nav-link" href="./tasks/create">Create task</a>
+          <% if (locals.user) { %>
+            <a class="nav-link" href="./tasks">List</a>
+            <a class="nav-link" href="./tasks/create">Create task</a>
+          <% } %>
+        </div>
+        <div class="navbar-login">
+          <% if (locals.user) { %>
+            <a class="nav-link" href="./user/logout">Sign out</a>
+          <% } else { %>
+            <a class="nav-link" href="./user/login">Sign in</a>
+          <% } %>
         </div>
       </div>
     </div>
