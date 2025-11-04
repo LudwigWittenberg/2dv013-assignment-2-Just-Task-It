@@ -21,6 +21,7 @@ import { getSessionOptions } from "./config/sessionOptions.js";
 import { logger } from "./config/winston.js";
 import { router } from "./routes/router.js";
 import { connectToRedis } from "./config/redis.js";
+// Add helmet
 
 try {
 	// Connect to MongoDB.
