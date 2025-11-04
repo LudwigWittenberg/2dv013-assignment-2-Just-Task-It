@@ -136,14 +136,14 @@ services:
     # Specifies that Docker should restart the 'just-task-it' service if it fails.
     restart: always
 
-    # Resource limits for Kubernetes (kompose will convert this)
+    # Resource limits for Kubernetes (kompose will convert this to Deployment with resource limits)
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: '1.0'
           memory: 512M
         reservations:
-          cpus: '200m'
+          cpus: '0.2'
           memory: 256M
 
     # The 'environment' directive is used to set environment variables in the Docker container.
