@@ -7,6 +7,35 @@ substitutions:
   _NAMESPACE: "just-task-it"
   _LOCATION: "europe-north2"
 
+availableSecrets:
+  secretManager:
+    - versionName: projects/${PROJECT_ID}/secrets/BASE_URL/versions/latest
+      env: BASE_URL
+    - versionName: projects/${PROJECT_ID}/secrets/DB_CONNECTION_STRING/versions/latest
+      env: DB_CONNECTION_STRING
+    - versionName: projects/${PROJECT_ID}/secrets/LOG_LEVEL/versions/latest
+      env: LOG_LEVEL
+    - versionName: projects/${PROJECT_ID}/secrets/LOGGER_MORGAN_FORMAT_ADD_REMOTE/versions/latest
+      env: LOGGER_MORGAN_FORMAT_ADD_REMOTE
+    - versionName: projects/${PROJECT_ID}/secrets/LOGGER_COMBINED_LOG_FILE/versions/latest
+      env: LOGGER_COMBINED_LOG_FILE
+    - versionName: projects/${PROJECT_ID}/secrets/LOGGER_ERROR_LOG_FILE/versions/latest
+      env: LOGGER_ERROR_LOG_FILE
+    - versionName: projects/${PROJECT_ID}/secrets/LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE/versions/latest
+      env: LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE
+    - versionName: projects/${PROJECT_ID}/secrets/RABBIT_CONNECTION_STRING/versions/latest
+      env: RABBIT_CONNECTION_STRING
+    - versionName: projects/${PROJECT_ID}/secrets/RABBIT_QUEUE/versions/latest
+      env: RABBIT_QUEUE
+    - versionName: projects/${PROJECT_ID}/secrets/REDIS_URL/versions/latest
+      env: REDIS_URL
+    - versionName: projects/${PROJECT_ID}/secrets/SESSION_NAME/versions/latest
+      env: SESSION_NAME
+    - versionName: projects/${PROJECT_ID}/secrets/SESSION_SECRET/versions/latest
+      env: SESSION_SECRET
+    - versionName: projects/${PROJECT_ID}/secrets/PORT/versions/latest
+      env: PORT
+
 steps:
   # Step 1: Build Docker image with SHA-based tagging
   - name: 'gcr.io/cloud-builders/docker'
@@ -29,6 +58,20 @@ steps:
   #    Vi skriver allt till ETT yaml-dokument (kind: List) så det är lätt att applicera.
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
+    secretEnv:
+      - BASE_URL
+      - DB_CONNECTION_STRING
+      - LOG_LEVEL
+      - LOGGER_MORGAN_FORMAT_ADD_REMOTE
+      - LOGGER_COMBINED_LOG_FILE
+      - LOGGER_ERROR_LOG_FILE
+      - LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE
+      - RABBIT_CONNECTION_STRING
+      - RABBIT_QUEUE
+      - REDIS_URL
+      - SESSION_NAME
+      - SESSION_SECRET
+      - PORT
     args:
       - -c
       - |

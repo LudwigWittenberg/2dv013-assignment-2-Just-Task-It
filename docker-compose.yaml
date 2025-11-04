@@ -150,7 +150,7 @@ services:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-mongodb://mongodb:27017/just-task-it}
 
       # The port that the Express application listens on. Defaults to 3000 if not provided.
-      - PORT=${EXPRESS_APP_PORT:-3002}
+      - PORT=${PORT:-3002}
 
       # The name of the session. Defaults to 'just-task-it-feat-logging.user-session' if not provided.
       - SESSION_NAME=${SESSION_NAME:-just-task-it-feat-logging.user-session}
