@@ -122,11 +122,6 @@ services:
     # Kompose labels for Kubernetes configuration
     labels:
       kompose.image-pull-policy: "Never"
-      kompose.service.type: deployment
-      kompose.service.resources.limits.cpu: "1000m"
-      kompose.service.resources.limits.memory: "512Mi"
-      kompose.service.resources.requests.cpu: "200m"
-      kompose.service.resources.requests.memory: "256Mi"
 
     # Specifies that the 'just-task-it' service depends on the 'mongodb' service.
     # This means that Docker will start the 'mongodb' service before the 'just-task-it' service.
@@ -140,6 +135,16 @@ services:
 
     # Specifies that Docker should restart the 'just-task-it' service if it fails.
     restart: always
+
+    # Resource limits for Kubernetes (kompose will convert this)
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '200m'
+          memory: 256M
 
     # The 'environment' directive is used to set environment variables in the Docker container.
     # These variables can be accessed by the application running inside the container.
