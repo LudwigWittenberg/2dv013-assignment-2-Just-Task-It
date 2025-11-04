@@ -1,12 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: web
+  name: just-task-it
+  namespace: just-task-it
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: web
+    name: just-task-it
   minReplicas: 1
   maxReplicas: 4
   metrics:
