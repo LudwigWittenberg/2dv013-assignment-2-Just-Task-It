@@ -31,6 +31,7 @@ spec:
   - port: 80
     targetPort: 3002
 
+---
 # Docker Desktop Kubernetes - Simple NodePort Service
 apiVersion: v1
 kind: Service
