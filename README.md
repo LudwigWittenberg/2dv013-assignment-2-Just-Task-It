@@ -2,7 +2,7 @@
 
 ## Overview
 
-This represents a Docker implementation of the 'Just Task It!' web application.
+This represents a Docker implementation of the 'Just Task It!' web application. 
 
 ## How to Use
 
